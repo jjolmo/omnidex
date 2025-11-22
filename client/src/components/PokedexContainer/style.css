@@ -1,0 +1,8 @@
+.pokedex-container {
+  border: red 2px solid;
+  padding: 12px;
+}
+
+.pokemon-name {
+    text-transform: capitalize ;
+}

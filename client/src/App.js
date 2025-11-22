@@ -1,18 +1,12 @@
 import "./App.css";
 import React from "react";
-import Main from "./pages/Main";
-import Box from "@mui/material/Box";
+import Pokedex from "./pages/Pokedex";
 
 function App() {
   return (
-      <Box
-          className="App"
-          sx={{
-            minHeight: "100vh",
-          }}
-      >
-        <Main />
-      </Box>
+      <div className="App">
+        <Pokedex />
+      </div>
   );
 }
 
