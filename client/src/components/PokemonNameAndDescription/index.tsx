@@ -1,3 +1,5 @@
+import './style.css';
+
 interface PokemonNameAndDescription {
     name: string
     description: string
