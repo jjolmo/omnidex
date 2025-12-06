@@ -74,7 +74,7 @@ export default function PokedexContainer(): JSX.Element {
 
     const getPokemonSpecies = async () => {
       const res = await fetch(
-        "https://pokeapi.co/api/v2/pokemon-species/" + pokemonNumber,
+        `https://pokeapi.co/api/v2/pokemon-species/${pokemonNumber}`,
       );
 
       await new Promise((r) => setTimeout(r, 2000));
