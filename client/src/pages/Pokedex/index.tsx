@@ -1,9 +1,18 @@
 import React from "react";
 import PokedexContainer from "../../components/PokedexContainer";
 
-export default function Pokedex(): JSX.Element {
-  return (
-    <PokedexContainer/>
-  );
+interface PokedexProps {
+  theme?: string;
+  generation?: number;
+  version: string;
 }
 
+export default function Pokedex(props: PokedexProps): JSX.Element {
+  return (
+    <PokedexContainer
+      theme={props.theme}
+      generation={props.generation}
+      version={props.version}
+    />
+  );
+}

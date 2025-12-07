@@ -1,5 +1,21 @@
 .pokedex-container {
-  border: red 2px solid;
-  padding: 12px;
+    border: red 2px solid;
+    padding: 12px;
+}
+.pokedex-container--dark {
+    background-color: black;
+    color: white;
 }
 
+.pokemon-sprite {
+    border: red 5px solid;
+    border-radius: 5px;
+    width: 128px;
+    height: 128px;
+    background-color: lightgray;
+}
+
+.pokemon-sprite--dark {
+    border-color: brown;
+    background-color: black;
+}
