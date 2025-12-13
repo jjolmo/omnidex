@@ -1,4 +1,4 @@
-import React, { useEffect, useState, ChangeEvent } from "react";
+import React, { useEffect, useState, ChangeEvent, useContext } from "react";
 import "./style.css";
 import PokemonNameAndDescription from "../PokemonNameAndDescription";
 import ButtonPikachu from "../ButtonPikachu";
@@ -6,6 +6,8 @@ import ButtonClean from "../ButtonClean";
 import ButtonNavigate from "../ButtonNavigate";
 import { getClassNameWithTheme } from "../ThemeSwitcher";
 import usePokemonsCount from "../../hooks/usePokemonsCount";
+import { PreferencesContext } from "../../contexts/PreferencesContext";
+import useTranslate from "../../hooks/useTranlate";
 
 type PokeApiPokemonResponse = {
   name: string;
@@ -51,6 +53,15 @@ export default function PokedexContainer(
   const [pokemonDescription, setPokemonDescription] = useState<string>("");
   const [pokemonCry, setPokemonCry] = useState<string>("");
   const [pokemonSprite, setPokemonSprite] = useState<string>("");
+
+  const { translate } = useTranslate();
+
+  //const preferences = useContext(PreferencesContext);
+  // const language = preferences?.language || "es";
+  // const fallbackLanguage = preferences?.fallbackLanguage || "en";
+
+  // Destructurar lo anterior
+  const { language, fallbackLanguage } = useContext(PreferencesContext);
 
   const { isLoading: isLoadingPokemonsCount, totalPokemonsCount } =
     usePokemonsCount();
@@ -100,24 +111,27 @@ export default function PokedexContainer(
       const data: PokeApiSpeciesResponse = await res.json();
 
       let description = data.flavor_text_entries.find((x) => {
-        return x.version.name === props.version && x.language.name === "es";
+        return x.version.name === props.version && x.language.name === language;
       });
 
       if (!description) {
         description = data.flavor_text_entries.find((x) => {
-          return x.version.name === props.version && x.language.name === "en";
+          return (
+            x.version.name === props.version &&
+            x.language.name === fallbackLanguage
+          );
         });
       }
 
       if (!description) {
         description = data.flavor_text_entries.find((x) => {
-          return x.language.name === "es";
+          return x.language.name === language;
         });
       }
 
       if (!description) {
         description = data.flavor_text_entries.find((x) => {
-          return x.language.name === "en";
+          return x.language.name === fallbackLanguage;
         });
       }
 
@@ -142,7 +156,7 @@ export default function PokedexContainer(
       getPokemonBasics();
       getPokemonSpecies();
     }
-  }, [pokemonNumber, props.version]);
+  }, [pokemonNumber, props.version, language]);
 
   {
     /*
@@ -240,10 +254,12 @@ export default function PokedexContainer(
         <button onClick={() => setPokemonNumber(25)}>Pikachu</button>
         */}
         <ButtonClean
-          buttonText="Limpiar"
+          //buttonText={translate("Limpiar")}
+          buttonText={translate("Limpiar")}
           handleClick={() => setPokemonNumber("")}
         />
         <ButtonPikachu handleClick={() => setPokemonNumber(25)} />
+        <p>{language}</p>
       </div>
     </div>
   );

@@ -5,6 +5,7 @@ import ThemeSwitcher from "./components/ThemeSwitcher";
 import GenerationSwitcher from "./components/GenerationSwitcher";
 import VersionSwitcher from "./components/VersionSwitcher";
 import PokemonsCount from "./components/PokemonsCount";
+import LanguagePicker from "./components/LanguagePicker";
 
 function App(): JSX.Element {
   const [theme, setTheme] = useState<string>("light");
@@ -24,6 +25,8 @@ function App(): JSX.Element {
           setVersion(version);
         }}
       />
+      <LanguagePicker />
+
       {version !== "" ? (
         <Pokedex theme={theme} generation={generation} version={version} />
       ) : (
