@@ -7,7 +7,7 @@ import ButtonNavigate from "../ButtonNavigate";
 import { getClassNameWithTheme } from "../ThemeSwitcher";
 import usePokemonsCount from "../../hooks/usePokemonsCount";
 import { PreferencesContext } from "../../contexts/PreferencesContext";
-import useTranslate from "../../hooks/useTranlate";
+import useTranslate from "../../hooks/useTranslate";
 
 type PokeApiPokemonResponse = {
   name: string;
@@ -114,6 +114,14 @@ export default function PokedexContainer(
         return x.version.name === props.version && x.language.name === language;
       });
 
+      if (!description && language === "ja") {
+        description = data.flavor_text_entries.find((x) => {
+          return (
+            x.version.name === props.version && x.language.name === "ja-Hrkt"
+          );
+        });
+      }
+
       if (!description) {
         description = data.flavor_text_entries.find((x) => {
           return (
@@ -126,6 +134,12 @@ export default function PokedexContainer(
       if (!description) {
         description = data.flavor_text_entries.find((x) => {
           return x.language.name === language;
+        });
+      }
+
+      if (!description && language === "ja") {
+        description = data.flavor_text_entries.find((x) => {
+          return x.language.name === "ja-Hrkt";
         });
       }
 
@@ -231,7 +245,7 @@ export default function PokedexContainer(
           description={
             pokemonName === pokemonSpeciesName
               ? pokemonDescription
-              : "loading..."
+              : `${translate("loading")}...`
           }
         />
       }
@@ -255,11 +269,10 @@ export default function PokedexContainer(
         */}
         <ButtonClean
           //buttonText={translate("Limpiar")}
-          buttonText={translate("Limpiar")}
+          buttonText={translate("Clean")}
           handleClick={() => setPokemonNumber("")}
         />
         <ButtonPikachu handleClick={() => setPokemonNumber(25)} />
-        <p>{language}</p>
       </div>
     </div>
   );

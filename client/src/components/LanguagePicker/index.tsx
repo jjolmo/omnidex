@@ -16,7 +16,7 @@ export default function LanguagePicker(): JSX.Element {
         {languages.map((lang) => {
           return (
             <option key={lang} value={lang}>
-              {lang}
+              {lang.toUpperCase()}
             </option>
           );
         })}
