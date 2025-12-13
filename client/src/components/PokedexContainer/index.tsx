@@ -1,9 +1,13 @@
 import React, { useEffect, useState, ChangeEvent } from "react";
 import "./style.css";
 import PokemonNameAndDescription from "../PokemonNameAndDescription";
-import PokemonsCount from "../PokemonsCount";
+import ButtonPikachu from "../ButtonPikachu";
+import ButtonClean from "../ButtonClean";
+import ButtonNavigate from "../ButtonNavigate";
+import { getClassNameWithTheme } from "../ThemeSwitcher";
+import usePokemonsCount from "../../hooks/usePokemonsCount";
 
-type PokeApiBasicResponse = {
+type PokeApiPokemonResponse = {
   name: string;
   cries: {
     legacy?: string;
@@ -25,17 +29,31 @@ type PokeApiSpeciesResponse = {
     language: {
       name: string;
     };
+    version: {
+      name: string;
+    };
     flavor_text: string;
   }[];
 };
 
-export default function PokedexContainer(): JSX.Element {
+interface PokedexContainerProps {
+  theme?: string;
+  generation?: number;
+  version: string;
+}
+
+export default function PokedexContainer(
+  props: PokedexContainerProps,
+): JSX.Element {
   const [pokemonNumber, setPokemonNumber] = useState<number | "">(25);
   const [pokemonName, setPokemonName] = useState<string>("");
   const [pokemonSpeciesName, setPokemonSpeciesName] = useState<string>("");
   const [pokemonDescription, setPokemonDescription] = useState<string>("");
   const [pokemonCry, setPokemonCry] = useState<string>("");
   const [pokemonSprite, setPokemonSprite] = useState<string>("");
+
+  const { isLoading: isLoadingPokemonsCount, totalPokemonsCount } =
+    usePokemonsCount();
 
   const handleOnPokemonNumberChange = (
     event: ChangeEvent<HTMLInputElement>,
@@ -65,7 +83,7 @@ export default function PokedexContainer(): JSX.Element {
 
       //await new Promise(r => setTimeout(r, 4000));
 
-      const data: PokeApiBasicResponse = await res.json();
+      const data: PokeApiPokemonResponse = await res.json();
 
       setPokemonName(data.name);
       setPokemonCry(data.cries.legacy ?? data.cries.latest ?? "");
@@ -82,8 +100,20 @@ export default function PokedexContainer(): JSX.Element {
       const data: PokeApiSpeciesResponse = await res.json();
 
       let description = data.flavor_text_entries.find((x) => {
-        return x.language.name === "es";
+        return x.version.name === props.version && x.language.name === "es";
       });
+
+      if (!description) {
+        description = data.flavor_text_entries.find((x) => {
+          return x.version.name === props.version && x.language.name === "en";
+        });
+      }
+
+      if (!description) {
+        description = data.flavor_text_entries.find((x) => {
+          return x.language.name === "es";
+        });
+      }
 
       if (!description) {
         description = data.flavor_text_entries.find((x) => {
@@ -92,15 +122,10 @@ export default function PokedexContainer(): JSX.Element {
       }
 
       setPokemonSpeciesName(data.varieties[0].pokemon.name);
-      /*
-      if (description) {
-        setPokemonDescription(description.flavor_text);
-      }
-      else {
-        setPokemonDescription("Not found");
-      }
-      */
-      setPokemonDescription(description?.flavor_text ?? "not found");
+      setPokemonDescription(
+        description?.flavor_text ??
+          `No entry for ${pokemonName.charAt(0).toUpperCase() + pokemonName.slice(1).toLowerCase()} in ${props.version.charAt(0).toUpperCase() + props.version.slice(1).toLowerCase()}`,
+      );
     };
 
     setPokemonName("");
@@ -109,11 +134,15 @@ export default function PokedexContainer(): JSX.Element {
     setPokemonSprite("");
     setPokemonCry("");
 
-    if (pokemonNumber !== "") {
+    if (
+      Number.isFinite(pokemonNumber) &&
+      +pokemonNumber > 0 &&
+      +pokemonNumber <= totalPokemonsCount
+    ) {
       getPokemonBasics();
       getPokemonSpecies();
     }
-  }, [pokemonNumber]);
+  }, [pokemonNumber, props.version]);
 
   {
     /*
@@ -140,15 +169,38 @@ export default function PokedexContainer(): JSX.Element {
       />
       */}
 
-      <input
-        type="number"
-        id="pokeid"
-        name="pokeid"
-        min="1"
-        max="10000"
-        value={pokemonNumber}
-        onChange={handleOnPokemonNumberChange} // esto le pasa todos los argumentos de onChange como argumentos a la función handle, aunque no lo ponga en ningún sitio, porque mierdas de sugarcoating
-      />
+      <div>
+        <ButtonNavigate
+          buttonText="<<"
+          enabled={+pokemonNumber !== 1}
+          handleClick={() => setPokemonNumber(1)}
+        />
+        <ButtonNavigate
+          buttonText="<"
+          enabled={+pokemonNumber > 1}
+          handleClick={() => setPokemonNumber(Number(pokemonNumber) - 1)}
+        />
+
+        <input
+          type="number"
+          id="pokeid"
+          name="pokeid"
+          min="1"
+          max={totalPokemonsCount}
+          value={pokemonNumber}
+          onChange={handleOnPokemonNumberChange} // esto le pasa todos los argumentos de onChange como argumentos a la función handle, aunque no lo ponga en ningún sitio, porque mierdas de sugarcoating
+        />
+        <ButtonNavigate
+          buttonText=">"
+          enabled={+pokemonNumber < totalPokemonsCount}
+          handleClick={() => setPokemonNumber(Number(pokemonNumber) + 1)}
+        />
+        <ButtonNavigate
+          buttonText=">>"
+          enabled={+pokemonNumber !== totalPokemonsCount}
+          handleClick={() => setPokemonNumber(totalPokemonsCount)}
+        />
+      </div>
 
       {/*
       <div className="pokemon-name">{pokemonName}</div>
@@ -163,7 +215,9 @@ export default function PokedexContainer(): JSX.Element {
         <PokemonNameAndDescription
           name={pokemonName}
           description={
-            pokemonName === pokemonSpeciesName ? pokemonDescription : "Loading"
+            pokemonName === pokemonSpeciesName
+              ? pokemonDescription
+              : "loading..."
           }
         />
       }
@@ -173,15 +227,24 @@ export default function PokedexContainer(): JSX.Element {
       </audio>
 
       <div>
-        <img src={pokemonSprite} alt={pokemonName}></img>
+        <img
+          className={getClassNameWithTheme("pokemon-sprite", props.theme ?? "")}
+          src={pokemonSprite}
+          alt={pokemonName}
+        ></img>
       </div>
 
       <div>
+        {/*
         <button onClick={() => setPokemonNumber("")}>Limpiar</button>
         <button onClick={() => setPokemonNumber(25)}>Pikachu</button>
+        */}
+        <ButtonClean
+          buttonText="Limpiar"
+          handleClick={() => setPokemonNumber("")}
+        />
+        <ButtonPikachu handleClick={() => setPokemonNumber(25)} />
       </div>
-
-      {<PokemonsCount />}
     </div>
   );
 }
