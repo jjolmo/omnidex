@@ -9,7 +9,7 @@ import PokemonsCount from "./components/PokemonsCount";
 function App(): JSX.Element {
   const [theme, setTheme] = useState<string>("light");
   const [generation, setGeneration] = useState<number>(1);
-  const [version, setVersion] = useState<string>("blue");
+  const [version, setVersion] = useState<string>("");
 
   return (
     <div className="App">
@@ -24,7 +24,12 @@ function App(): JSX.Element {
           setVersion(version);
         }}
       />
-      <Pokedex theme={theme} generation={generation} version={version} />
+      {version !== "" ? (
+        <Pokedex theme={theme} generation={generation} version={version} />
+      ) : (
+        <p>Loading...</p>
+      )}
+
       <PokemonsCount />
     </div>
   );

@@ -1,11 +1,11 @@
 import React, { useEffect, useState, ChangeEvent } from "react";
 import "./style.css";
 import PokemonNameAndDescription from "../PokemonNameAndDescription";
-import PokemonsCount from "../PokemonsCount";
 import ButtonPikachu from "../ButtonPikachu";
 import ButtonClean from "../ButtonClean";
 import ButtonNavigate from "../ButtonNavigate";
 import { getClassNameWithTheme } from "../ThemeSwitcher";
+import usePokemonsCount from "../../hooks/usePokemonsCount";
 
 type PokeApiPokemonResponse = {
   name: string;
@@ -51,6 +51,9 @@ export default function PokedexContainer(
   const [pokemonDescription, setPokemonDescription] = useState<string>("");
   const [pokemonCry, setPokemonCry] = useState<string>("");
   const [pokemonSprite, setPokemonSprite] = useState<string>("");
+
+  const { isLoading: isLoadingPokemonsCount, totalPokemonsCount } =
+    usePokemonsCount();
 
   const handleOnPokemonNumberChange = (
     event: ChangeEvent<HTMLInputElement>,
@@ -106,7 +109,6 @@ export default function PokedexContainer(
         });
       }
 
-      /*
       if (!description) {
         description = data.flavor_text_entries.find((x) => {
           return x.language.name === "es";
@@ -118,7 +120,6 @@ export default function PokedexContainer(
           return x.language.name === "en";
         });
       }
-      */
 
       setPokemonSpeciesName(data.varieties[0].pokemon.name);
       setPokemonDescription(
@@ -136,7 +137,7 @@ export default function PokedexContainer(
     if (
       Number.isFinite(pokemonNumber) &&
       +pokemonNumber > 0 &&
-      +pokemonNumber < 1328
+      +pokemonNumber <= totalPokemonsCount
     ) {
       getPokemonBasics();
       getPokemonSpecies();
@@ -185,19 +186,19 @@ export default function PokedexContainer(
           id="pokeid"
           name="pokeid"
           min="1"
-          max="1025"
+          max={totalPokemonsCount}
           value={pokemonNumber}
           onChange={handleOnPokemonNumberChange} // esto le pasa todos los argumentos de onChange como argumentos a la función handle, aunque no lo ponga en ningún sitio, porque mierdas de sugarcoating
         />
         <ButtonNavigate
           buttonText=">"
-          enabled={+pokemonNumber < 1025}
+          enabled={+pokemonNumber < totalPokemonsCount}
           handleClick={() => setPokemonNumber(Number(pokemonNumber) + 1)}
         />
         <ButtonNavigate
           buttonText=">>"
-          enabled={+pokemonNumber !== 1025}
-          handleClick={() => setPokemonNumber(1025)}
+          enabled={+pokemonNumber !== totalPokemonsCount}
+          handleClick={() => setPokemonNumber(totalPokemonsCount)}
         />
       </div>
 

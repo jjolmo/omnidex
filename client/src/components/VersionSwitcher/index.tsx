@@ -34,7 +34,6 @@ export default function VersionSwitcher(
           versions.push(...data.results);
           await new Promise((r) => setTimeout(r, 100));
           urlNextPage = data.next;
-          debugger;
         } catch (e) {
           //salimos
           break;
@@ -45,6 +44,9 @@ export default function VersionSwitcher(
         setVersions(versions);
       }
       setIsLoading(false);
+      if (props.onChangeVersion) {
+        props.onChangeVersion(versions[0].name);
+      }
 
       //await new Promise(r => setTimeout(r, 4000));
     };
