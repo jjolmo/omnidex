@@ -1,11 +1,13 @@
-import React, { useEffect, useState, ChangeEvent } from "react";
+import React, { useEffect, useState, ChangeEvent, useContext } from "react";
 import "./style.css";
 import PokemonNameAndDescription from "../PokemonNameAndDescription";
 import ButtonPikachu from "../ButtonPikachu";
 import ButtonClean from "../ButtonClean";
 import ButtonNavigate from "../ButtonNavigate";
-import { getClassNameWithTheme } from "../ThemeSwitcher";
 import usePokemonsCount from "../../hooks/usePokemonsCount";
+import { PreferencesContext } from "../../contexts/PreferencesContext";
+import useTranslate from "../../hooks/useTranslate";
+import { getClassNameWithTheme } from "../ThemePicker";
 
 type PokeApiPokemonResponse = {
   name: string;
@@ -52,6 +54,15 @@ export default function PokedexContainer(
   const [pokemonCry, setPokemonCry] = useState<string>("");
   const [pokemonSprite, setPokemonSprite] = useState<string>("");
 
+  const { translate } = useTranslate();
+
+  //const preferences = useContext(PreferencesContext);
+  // const language = preferences?.language || "es";
+  // const fallbackLanguage = preferences?.fallbackLanguage || "en";
+
+  // Destructurar lo anterior
+  const { language, fallbackLanguage, theme } = useContext(PreferencesContext);
+
   const { isLoading: isLoadingPokemonsCount, totalPokemonsCount } =
     usePokemonsCount();
 
@@ -95,35 +106,52 @@ export default function PokedexContainer(
         `https://pokeapi.co/api/v2/pokemon-species/${pokemonNumber}`,
       );
 
-      await new Promise((r) => setTimeout(r, 2000));
+      await new Promise((r) => setTimeout(r, 1000));
 
       const data: PokeApiSpeciesResponse = await res.json();
 
       let description = data.flavor_text_entries.find((x) => {
-        return x.version.name === props.version && x.language.name === "es";
+        return x.version.name === props.version && x.language.name === language;
       });
 
-      if (!description) {
+      if (!description && language === "ja") {
         description = data.flavor_text_entries.find((x) => {
-          return x.version.name === props.version && x.language.name === "en";
+          return (
+            x.version.name === props.version && x.language.name === "ja-Hrkt"
+          );
         });
       }
 
       if (!description) {
         description = data.flavor_text_entries.find((x) => {
-          return x.language.name === "es";
+          return (
+            x.version.name === props.version &&
+            x.language.name === fallbackLanguage
+          );
         });
       }
 
       if (!description) {
         description = data.flavor_text_entries.find((x) => {
-          return x.language.name === "en";
+          return x.language.name === language;
+        });
+      }
+
+      if (!description && language === "ja") {
+        description = data.flavor_text_entries.find((x) => {
+          return x.language.name === "ja-Hrkt";
+        });
+      }
+
+      if (!description) {
+        description = data.flavor_text_entries.find((x) => {
+          return x.language.name === fallbackLanguage;
         });
       }
 
       setPokemonSpeciesName(data.varieties[0].pokemon.name);
       setPokemonDescription(
-        description?.flavor_text ??
+        description?.flavor_text.replaceAll("", " ") ??
           `No entry for ${pokemonName.charAt(0).toUpperCase() + pokemonName.slice(1).toLowerCase()} in ${props.version.charAt(0).toUpperCase() + props.version.slice(1).toLowerCase()}`,
       );
     };
@@ -142,7 +170,7 @@ export default function PokedexContainer(
       getPokemonBasics();
       getPokemonSpecies();
     }
-  }, [pokemonNumber, props.version]);
+  }, [pokemonNumber, props.version, language]);
 
   {
     /*
@@ -217,7 +245,7 @@ export default function PokedexContainer(
           description={
             pokemonName === pokemonSpeciesName
               ? pokemonDescription
-              : "loading..."
+              : `${translate("loading...")}`
           }
         />
       }
@@ -228,7 +256,7 @@ export default function PokedexContainer(
 
       <div>
         <img
-          className={getClassNameWithTheme("pokemon-sprite", props.theme ?? "")}
+          className={getClassNameWithTheme("pokemon-sprite", theme)}
           src={pokemonSprite}
           alt={pokemonName}
         ></img>
@@ -240,7 +268,8 @@ export default function PokedexContainer(
         <button onClick={() => setPokemonNumber(25)}>Pikachu</button>
         */}
         <ButtonClean
-          buttonText="Limpiar"
+          //buttonText={translate("Limpiar")}
+          buttonText={translate("Clear")}
           handleClick={() => setPokemonNumber("")}
         />
         <ButtonPikachu handleClick={() => setPokemonNumber(25)} />

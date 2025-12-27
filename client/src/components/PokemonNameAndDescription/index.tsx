@@ -1,10 +1,10 @@
-interface PokemonNameAndDescription {
+interface PokemonNameAndDescriptionProps {
   name: string;
   description: string;
 }
 
 export default function PokemonNameAndDescription(
-  props: PokemonNameAndDescription,
+  props: PokemonNameAndDescriptionProps,
 ): JSX.Element {
   return (
     <>
