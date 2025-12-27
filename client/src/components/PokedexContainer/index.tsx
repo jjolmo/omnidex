@@ -4,10 +4,10 @@ import PokemonNameAndDescription from "../PokemonNameAndDescription";
 import ButtonPikachu from "../ButtonPikachu";
 import ButtonClean from "../ButtonClean";
 import ButtonNavigate from "../ButtonNavigate";
-import { getClassNameWithTheme } from "../ThemeSwitcher";
 import usePokemonsCount from "../../hooks/usePokemonsCount";
 import { PreferencesContext } from "../../contexts/PreferencesContext";
 import useTranslate from "../../hooks/useTranslate";
+import { getClassNameWithTheme } from "../ThemePicker";
 
 type PokeApiPokemonResponse = {
   name: string;
@@ -61,7 +61,7 @@ export default function PokedexContainer(
   // const fallbackLanguage = preferences?.fallbackLanguage || "en";
 
   // Destructurar lo anterior
-  const { language, fallbackLanguage } = useContext(PreferencesContext);
+  const { language, fallbackLanguage, theme } = useContext(PreferencesContext);
 
   const { isLoading: isLoadingPokemonsCount, totalPokemonsCount } =
     usePokemonsCount();
@@ -106,7 +106,7 @@ export default function PokedexContainer(
         `https://pokeapi.co/api/v2/pokemon-species/${pokemonNumber}`,
       );
 
-      await new Promise((r) => setTimeout(r, 2000));
+      await new Promise((r) => setTimeout(r, 1000));
 
       const data: PokeApiSpeciesResponse = await res.json();
 
@@ -151,7 +151,7 @@ export default function PokedexContainer(
 
       setPokemonSpeciesName(data.varieties[0].pokemon.name);
       setPokemonDescription(
-        description?.flavor_text ??
+        description?.flavor_text.replaceAll("", " ") ??
           `No entry for ${pokemonName.charAt(0).toUpperCase() + pokemonName.slice(1).toLowerCase()} in ${props.version.charAt(0).toUpperCase() + props.version.slice(1).toLowerCase()}`,
       );
     };
@@ -245,7 +245,7 @@ export default function PokedexContainer(
           description={
             pokemonName === pokemonSpeciesName
               ? pokemonDescription
-              : `${translate("loading")}...`
+              : `${translate("loading...")}`
           }
         />
       }
@@ -256,7 +256,7 @@ export default function PokedexContainer(
 
       <div>
         <img
-          className={getClassNameWithTheme("pokemon-sprite", props.theme ?? "")}
+          className={getClassNameWithTheme("pokemon-sprite", theme)}
           src={pokemonSprite}
           alt={pokemonName}
         ></img>
@@ -269,7 +269,7 @@ export default function PokedexContainer(
         */}
         <ButtonClean
           //buttonText={translate("Limpiar")}
-          buttonText={translate("Clean")}
+          buttonText={translate("Clear")}
           handleClick={() => setPokemonNumber("")}
         />
         <ButtonPikachu handleClick={() => setPokemonNumber(25)} />

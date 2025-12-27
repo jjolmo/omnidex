@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { StyledBoxChildrenExample } from "../StyledBoxChildrenExample";
 
 export default function PokemonsCount(): JSX.Element {
   const [totalPokemonsCount, setTotalPokemonsCount] = useState<number>(151);
@@ -18,6 +19,8 @@ export default function PokemonsCount(): JSX.Element {
   return (
     <>
       <p>Pokes totales: {totalPokemonsCount}</p>
+
+      <StyledBoxChildrenExample>asda asdasd asd sd</StyledBoxChildrenExample>
     </>
   );
 }

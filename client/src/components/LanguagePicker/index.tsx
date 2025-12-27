@@ -2,13 +2,15 @@ import { useContext } from "react";
 import { PreferencesContext } from "../../contexts/PreferencesContext";
 
 export default function LanguagePicker(): JSX.Element {
-  const { languages, setLanguage } = useContext(PreferencesContext);
+  const { language, languages, changeLanguage } =
+    useContext(PreferencesContext);
 
   return (
     <>
       <select
+        value={language}
         onChange={(event) => {
-          setLanguage(event.target.value);
+          changeLanguage(event.target.value);
         }}
         name="languages"
         id="languages"

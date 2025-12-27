@@ -1,30 +1,26 @@
 import "./App.css";
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import Pokedex from "./pages/Pokedex";
-import ThemeSwitcher from "./components/ThemeSwitcher";
 import GenerationSwitcher from "./components/GenerationSwitcher";
 import VersionSwitcher from "./components/VersionSwitcher";
 import PokemonsCount from "./components/PokemonsCount";
 import LanguagePicker from "./components/LanguagePicker";
+import { PreferencesContext } from "./contexts/PreferencesContext";
+import ThemePicker from "./components/ThemePicker";
 
 function App(): JSX.Element {
-  const [theme, setTheme] = useState<string>("light");
+  const { theme } = useContext(PreferencesContext);
   const [generation, setGeneration] = useState<number>(1);
   const [version, setVersion] = useState<string>("");
 
   return (
     <div className="App">
-      <ThemeSwitcher
-        onChangeTheme={(theme) => {
-          setTheme(theme);
-        }}
-      />
-
       <VersionSwitcher
         onChangeVersion={(version) => {
           setVersion(version);
         }}
       />
+      <ThemePicker />
       <LanguagePicker />
 
       {version !== "" ? (
