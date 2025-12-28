@@ -1,6 +1,6 @@
 import { createContext, useEffect, useState } from "react";
 
-interface PreferencesProviderProps {
+interface PreferencesContextProviderProps {
   children: React.ReactElement;
 }
 // Lo del children es una movida que hay que hacer para luego poder hacer esto:
@@ -38,7 +38,7 @@ const defaultValue: PreferencesContextType = {
 export const PreferencesContext =
   createContext<PreferencesContextType>(defaultValue);
 
-export function PreferencesProvider({ children }: PreferencesProviderProps) {
+export function PreferencesContextProvider({ children }: PreferencesContextProviderProps) {
   const [language, setLanguage] = useState(defaultValue.language);
   const [theme, setTheme] = useState(defaultValue.theme);
 
