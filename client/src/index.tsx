@@ -3,7 +3,7 @@ import ReactDOM from "react-dom/client";
 import "./index.css";
 import App from "./App";
 import reportWebVitals from "./reportWebVitals";
-import { PreferencesProvider } from "./contexts/PreferencesContext";
+import { PreferencesContextProvider } from "./contexts/PreferencesContext";
 
 const rootElement = document.getElementById("root");
 if (!rootElement) {
@@ -13,9 +13,9 @@ if (!rootElement) {
 const root = ReactDOM.createRoot(rootElement);
 root.render(
   <React.StrictMode>
-    <PreferencesProvider>
+    <PreferencesContextProvider>
       <App />
-    </PreferencesProvider>
+    </PreferencesContextProvider>
   </React.StrictMode>,
 );
 
