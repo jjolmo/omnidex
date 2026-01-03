@@ -8,6 +8,7 @@ import { PreferencesContext } from "../../contexts/PreferencesContext";
 import useTranslate from "../../hooks/useTranslate";
 import { getClassNameWithTheme } from "../ThemePicker";
 import usePokemonsList from "../../hooks/usePokemonList";
+import { PokemonSelector } from "../PokemonSelector";
 
 type PokeApiPokemonResponse = {
   name: string;
@@ -196,6 +197,10 @@ export default function PokedexContainer(
       }}
       />
       */}
+
+      <div>
+        <PokemonSelector />
+      </div>
 
       <div>
         <ButtonNavigate
