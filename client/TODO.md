@@ -5,8 +5,10 @@
 - que PokedexContainer use la caché para el nombre - DONE
 - typeahead para buscar pokemons usando la caché que estamos guardando - DONE
 - router para pokemon - DONE
-- Página "about" para tener más de una Página
+- Página "about" para tener más de una Página - DONE
 - Header con cosas y navigator para cambiar de páginas
+- css
+- librería estilos
 - useMemo (translation se está llamando mil veces para el mismo botón)
 - useFetch
 - testing

@@ -82,8 +82,6 @@ export function PreferencesContextProvider({
   };
 
   const changeSelectedPokemonId = (id: number): void => {
-    debugger;
-
     setSelectedPokemonId(id);
     localStorage.setItem("selectedPokemonId", id + "");
   };

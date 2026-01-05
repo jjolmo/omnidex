@@ -1,18 +1,250 @@
-import React from "react";
-import PokedexContainer from "../../components/PokedexContainer";
+import React, { useEffect, useState, ChangeEvent, useContext } from "react";
+import "./style.css";
+import { PreferencesContext } from "../../contexts/PreferencesContext";
+import useTranslate from "../../hooks/useTranslate";
+import PokemonNameAndDescription from "../../components/PokemonNameAndDescription";
+import { PokemonSelector } from "../../components/PokemonSelector";
+import { getClassNameWithTheme } from "../../components/ThemePicker";
+import usePokemonsList from "../../hooks/usePokemonList";
+import { Link } from "react-router";
 
-interface PokedexProps {
+type PokeApiPokemonResponse = {
+  name: string;
+  cries: {
+    legacy?: string;
+    latest?: string;
+  };
+  sprites: {
+    front_female?: string;
+    front_default: string;
+  };
+};
+
+type PokeApiSpeciesResponse = {
+  varieties: {
+    pokemon: {
+      name: string;
+    };
+  }[];
+  flavor_text_entries: {
+    language: {
+      name: string;
+    };
+    version: {
+      name: string;
+    };
+    flavor_text: string;
+  }[];
+};
+
+interface PokedexContainerProps {
   theme?: string;
   generation?: number;
   version: string;
 }
 
-export default function Pokedex(props: PokedexProps): JSX.Element {
+export default function PokedexContainer(
+  props: PokedexContainerProps,
+): JSX.Element {
+  //const [pokemonNumber, setPokemonNumber] = useState<number | "">(25);
+  const [pokemonName, setPokemonName] = useState<string>("");
+  const [pokemonSpeciesName, setPokemonSpeciesName] = useState<string>("");
+  const [pokemonDescription, setPokemonDescription] = useState<string>("");
+  const [pokemonCry, setPokemonCry] = useState<string>("");
+  const [pokemonSprite, setPokemonSprite] = useState<string>("");
+
+  const { translate } = useTranslate();
+
+  //const preferences = useContext(PreferencesContext);
+  // const language = preferences?.language || "es";
+  // const fallbackLanguage = preferences?.fallbackLanguage || "en";
+
+  // Destructurar lo anterior
+  const {
+    language,
+    fallbackLanguage,
+    theme,
+    selectedPokemonId,
+    changeSelectedPokemonId,
+  } = useContext(PreferencesContext);
+
+  const { isLoading, totalPokemonsWithPokedexCount, pokemonList } =
+    usePokemonsList();
+
+  /*const handleOnPokemonNumberChange = (
+    event: ChangeEvent<HTMLInputElement>,
+  ): void => {
+    setPokemonNumber(+event.target.value); // + casts to number
+  };*/
+
+  useEffect(() => {
+    /*
+    (async () => {
+      const res = await fetch(
+        "https://pokeapi.co/api/v2/pokemon/" + pokemonNumber
+      );
+      const data: PokeApiBasicResponse = await res.json();
+      setPokemonName(data.name);
+      setPokemonCry(data.cries.legacy ?? data.cries.latest ?? "");
+      setPokemonSprite(data.sprites.front_female ?? data.sprites.front_default);
+      console.log(data.cries);
+
+    })();
+    */
+
+    const getPokemonBasics = async () => {
+      const res = await fetch(
+        "https://pokeapi.co/api/v2/pokemon/" + selectedPokemonId,
+      );
+
+      //await new Promise(r => setTimeout(r, 4000));
+
+      const data: PokeApiPokemonResponse = await res.json();
+
+      setPokemonName(data.name);
+      setPokemonCry(data.cries.legacy ?? data.cries.latest ?? "");
+      setPokemonSprite(data.sprites.front_female ?? data.sprites.front_default);
+    };
+
+    const getPokemonSpecies = async () => {
+      const res = await fetch(
+        `https://pokeapi.co/api/v2/pokemon-species/${selectedPokemonId}`,
+      );
+
+      await new Promise((r) => setTimeout(r, 1000));
+
+      const data: PokeApiSpeciesResponse = await res.json();
+
+      let description = data.flavor_text_entries.find((x) => {
+        return x.version.name === props.version && x.language.name === language;
+      });
+
+      if (!description && language === "ja") {
+        description = data.flavor_text_entries.find((x) => {
+          return (
+            x.version.name === props.version && x.language.name === "ja-Hrkt"
+          );
+        });
+      }
+
+      if (!description) {
+        description = data.flavor_text_entries.find((x) => {
+          return (
+            x.version.name === props.version &&
+            x.language.name === fallbackLanguage
+          );
+        });
+      }
+
+      if (!description) {
+        description = data.flavor_text_entries.find((x) => {
+          return x.language.name === language;
+        });
+      }
+
+      if (!description && language === "ja") {
+        description = data.flavor_text_entries.find((x) => {
+          return x.language.name === "ja-Hrkt";
+        });
+      }
+
+      if (!description) {
+        description = data.flavor_text_entries.find((x) => {
+          return x.language.name === fallbackLanguage;
+        });
+      }
+
+      setPokemonSpeciesName(data.varieties[0].pokemon.name);
+      setPokemonDescription(
+        description?.flavor_text.replaceAll("", " ") ??
+          `No entry for ${pokemonName.charAt(0).toUpperCase() + pokemonName.slice(1).toLowerCase()} in ${props.version.charAt(0).toUpperCase() + props.version.slice(1).toLowerCase()}`,
+      );
+    };
+
+    setPokemonName("");
+    setPokemonSpeciesName("");
+    setPokemonDescription("");
+    setPokemonSprite("");
+    setPokemonCry("");
+
+    if (
+      Number.isFinite(selectedPokemonId) &&
+      +selectedPokemonId > 0 &&
+      +selectedPokemonId <= totalPokemonsWithPokedexCount
+    ) {
+      getPokemonBasics();
+      getPokemonSpecies();
+    }
+  }, [selectedPokemonId, pokemonList, props.version, language]);
+
+  {
+    /*
+  // Cuando hay '=>' es una variable con una función, lo que hay a la izquierda son argumentos, y a la derecha la lógica
+  const handleOnPokemonNumberChange = (event) => {
+    setPokemonNumber(+event.target.value) // + castea a number
+  }
+  // Esto es lo mismo que lo anterior, y ambas son lo mismo que la anónima que hay en el onChange del input
+  function handleOnPokemonNumberChange2(event) {
+    setPokemonNumber(+event.target.value) // + castea a number
+  }
+  */
+  }
+
   return (
-    <PokedexContainer
-      theme={props.theme}
-      generation={props.generation}
-      version={props.version}
-    />
+    <div className="pokedex-container">
+      <h1>Pokedex</h1>
+
+      {/*
+      <input type="number" id="pokeid" name="pokeid" min="1" max="10000" value={pokemonNumber}
+      onChange={(event) => {
+        setPokemonNumber(+event.target.value) // + castea a number
+      }}
+      />
+      */}
+
+      <div>
+        <PokemonSelector />
+      </div>
+
+      {
+        <PokemonNameAndDescription
+          name={pokemonName}
+          description={
+            pokemonName === pokemonSpeciesName
+              ? pokemonDescription
+              : `${translate("loading...")}`
+          }
+        />
+      }
+
+      <audio key={pokemonCry} autoPlay>
+        <source src={pokemonCry} type="audio/ogg"></source>
+      </audio>
+
+      <div>
+        <img
+          className={getClassNameWithTheme("pokemon-sprite", theme)}
+          src={pokemonSprite}
+          alt={pokemonName}
+        ></img>
+      </div>
+
+      <div>
+        {/*
+        <button onClick={() => setPokemonNumber("")}>Limpiar</button>
+        <button onClick={() => setPokemonNumber(25)}>Pikachu</button>
+
+        <ButtonClean
+          //buttonText={translate("Limpiar")}
+          buttonText={translate("Clear")}
+          handleClick={() => changeSelectedPokemonId(0)}
+        />
+        <ButtonPikachu handleClick={() => changeSelectedPokemonId(25)} />
+        */}
+        <Link to="/pokemon/25/">
+          <button>Pikachu</button>
+        </Link>
+      </div>
+    </div>
   );
 }

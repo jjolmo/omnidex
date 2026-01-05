@@ -4,7 +4,6 @@ import "./index.css";
 import App from "./App";
 import reportWebVitals from "./reportWebVitals";
 import { PreferencesContextProvider } from "./contexts/PreferencesContext";
-import { BrowserRouter, Routes, Route } from "react-router";
 
 const rootElement = document.getElementById("root");
 if (!rootElement) {
@@ -16,15 +15,16 @@ root.render(
   <React.StrictMode>
     <PreferencesContextProvider>
       {/*
-      <App />
+        <BrowserRouter>
+          <Routes>
+            <Route path="/" action element={<App />} />
+            <Route path="pokemon/:pokeId/" element={<App />} />
+            <Route path="about" element={<About />} />
+            <Route path="*" element={<div>Error 404</div>} />
+          </Routes>
+        </BrowserRouter>
       */}
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" action element={<App />} />
-          <Route path="pokemon/:pokeId/" element={<App />} />
-          <Route path="*" element={<div>Error 404</div>} />
-        </Routes>
-      </BrowserRouter>
+      <App />
     </PreferencesContextProvider>
   </React.StrictMode>,
 );
