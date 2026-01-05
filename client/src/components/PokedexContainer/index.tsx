@@ -48,7 +48,7 @@ interface PokedexContainerProps {
 export default function PokedexContainer(
   props: PokedexContainerProps,
 ): JSX.Element {
-  const [pokemonNumber, setPokemonNumber] = useState<number | "">(25);
+  //const [pokemonNumber, setPokemonNumber] = useState<number | "">(25);
   const [pokemonName, setPokemonName] = useState<string>("");
   const [pokemonSpeciesName, setPokemonSpeciesName] = useState<string>("");
   const [pokemonDescription, setPokemonDescription] = useState<string>("");
@@ -62,16 +62,22 @@ export default function PokedexContainer(
   // const fallbackLanguage = preferences?.fallbackLanguage || "en";
 
   // Destructurar lo anterior
-  const { language, fallbackLanguage, theme } = useContext(PreferencesContext);
+  const {
+    language,
+    fallbackLanguage,
+    theme,
+    selectedPokemonId,
+    changeSelectedPokemonId,
+  } = useContext(PreferencesContext);
 
   const { isLoading, totalPokemonsWithPokedexCount, pokemonList } =
     usePokemonsList();
 
-  const handleOnPokemonNumberChange = (
+  /*const handleOnPokemonNumberChange = (
     event: ChangeEvent<HTMLInputElement>,
   ): void => {
     setPokemonNumber(+event.target.value); // + casts to number
-  };
+  };*/
 
   useEffect(() => {
     /*
@@ -90,7 +96,7 @@ export default function PokedexContainer(
 
     const getPokemonBasics = async () => {
       const res = await fetch(
-        "https://pokeapi.co/api/v2/pokemon/" + pokemonNumber,
+        "https://pokeapi.co/api/v2/pokemon/" + selectedPokemonId,
       );
 
       //await new Promise(r => setTimeout(r, 4000));
@@ -104,7 +110,7 @@ export default function PokedexContainer(
 
     const getPokemonSpecies = async () => {
       const res = await fetch(
-        `https://pokeapi.co/api/v2/pokemon-species/${pokemonNumber}`,
+        `https://pokeapi.co/api/v2/pokemon-species/${selectedPokemonId}`,
       );
 
       await new Promise((r) => setTimeout(r, 1000));
@@ -164,14 +170,14 @@ export default function PokedexContainer(
     setPokemonCry("");
 
     if (
-      Number.isFinite(pokemonNumber) &&
-      +pokemonNumber > 0 &&
-      +pokemonNumber <= totalPokemonsWithPokedexCount
+      Number.isFinite(selectedPokemonId) &&
+      +selectedPokemonId > 0 &&
+      +selectedPokemonId <= totalPokemonsWithPokedexCount
     ) {
       getPokemonBasics();
       getPokemonSpecies();
     }
-  }, [pokemonNumber, props.version, language]);
+  }, [selectedPokemonId, pokemonList, props.version, language]);
 
   {
     /*
@@ -202,48 +208,6 @@ export default function PokedexContainer(
         <PokemonSelector />
       </div>
 
-      <div>
-        <ButtonNavigate
-          buttonText="<<"
-          enabled={+pokemonNumber !== 1}
-          handleClick={() => setPokemonNumber(1)}
-        />
-        <ButtonNavigate
-          buttonText="<"
-          enabled={+pokemonNumber > 1}
-          handleClick={() => setPokemonNumber(Number(pokemonNumber) - 1)}
-        />
-
-        <input
-          type="number"
-          id="pokeid"
-          name="pokeid"
-          min="1"
-          max={totalPokemonsWithPokedexCount}
-          value={pokemonNumber}
-          onChange={handleOnPokemonNumberChange} // esto le pasa todos los argumentos de onChange como argumentos a la función handle, aunque no lo ponga en ningún sitio, porque mierdas de sugarcoating
-        />
-        <ButtonNavigate
-          buttonText=">"
-          enabled={+pokemonNumber < totalPokemonsWithPokedexCount}
-          handleClick={() => setPokemonNumber(Number(pokemonNumber) + 1)}
-        />
-        <ButtonNavigate
-          buttonText=">>"
-          enabled={+pokemonNumber !== totalPokemonsWithPokedexCount}
-          handleClick={() => setPokemonNumber(totalPokemonsWithPokedexCount)}
-        />
-      </div>
-
-      {/*
-      <div className="pokemon-name">{pokemonName}</div>
-      {
-        pokemonDescription && pokemonName
-          ? <div className="pokemon-description">{pokemonDescription}</div>
-          : <p>loading</p>
-      }
-      */}
-
       {
         <PokemonNameAndDescription
           name={pokemonName}
@@ -271,13 +235,14 @@ export default function PokedexContainer(
         {/*
         <button onClick={() => setPokemonNumber("")}>Limpiar</button>
         <button onClick={() => setPokemonNumber(25)}>Pikachu</button>
-        */}
+
         <ButtonClean
           //buttonText={translate("Limpiar")}
           buttonText={translate("Clear")}
-          handleClick={() => setPokemonNumber("")}
+          handleClick={() => changeSelectedPokemonId(0)}
         />
-        <ButtonPikachu handleClick={() => setPokemonNumber(25)} />
+        */}
+        <ButtonPikachu handleClick={() => changeSelectedPokemonId(25)} />
       </div>
     </div>
   );
