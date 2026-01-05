@@ -19,6 +19,8 @@ export type PreferencesContextType = {
   themes: string[];
   //setTheme: (theme: string) => void;
   changeTheme: (theme: string) => void;
+  selectedPokemonId: number;
+  changeSelectedPokemonId: (id: number) => void;
 };
 
 const defaultValue: PreferencesContextType = {
@@ -33,14 +35,23 @@ const defaultValue: PreferencesContextType = {
   changeTheme: () => {
     return null;
   },
+  selectedPokemonId: 25,
+  changeSelectedPokemonId: () => {
+    return null;
+  },
 };
 
 export const PreferencesContext =
   createContext<PreferencesContextType>(defaultValue);
 
-export function PreferencesContextProvider({ children }: PreferencesContextProviderProps) {
+export function PreferencesContextProvider({
+  children,
+}: PreferencesContextProviderProps) {
   const [language, setLanguage] = useState(defaultValue.language);
   const [theme, setTheme] = useState(defaultValue.theme);
+  const [selectedPokemonId, setSelectedPokemonId] = useState(
+    defaultValue.selectedPokemonId,
+  );
 
   // recuerda que un useEffect con el array de dependencias vacío, se ejecuta una única vez al cargar la aplicación
   useEffect(() => {
@@ -52,6 +63,11 @@ export function PreferencesContextProvider({ children }: PreferencesContextProvi
     const savedTheme = localStorage.getItem("theme");
     if (savedTheme) {
       setTheme(savedTheme);
+    }
+
+    const savedSelectedPokemonId = localStorage.getItem("selectedPokemonId");
+    if (savedSelectedPokemonId) {
+      setSelectedPokemonId(+savedSelectedPokemonId);
     }
   }, []);
 
@@ -65,6 +81,13 @@ export function PreferencesContextProvider({ children }: PreferencesContextProvi
     localStorage.setItem("theme", theme);
   };
 
+  const changeSelectedPokemonId = (id: number): void => {
+    debugger;
+
+    setSelectedPokemonId(id);
+    localStorage.setItem("selectedPokemonId", id + "");
+  };
+
   return (
     <PreferencesContext.Provider
       value={{
@@ -75,6 +98,8 @@ export function PreferencesContextProvider({ children }: PreferencesContextProvi
         themes: defaultValue.themes,
         theme,
         changeTheme,
+        selectedPokemonId: selectedPokemonId,
+        changeSelectedPokemonId,
       }}
     >
       {children}

@@ -19,6 +19,12 @@ const translations: Translation = {
     it: "caricamento...",
     ja: "ロード中...",
   },
+  "no results": {
+    es: "sin resultados",
+  },
+  "type to search": {
+    es: "escribe para buscar",
+  },
   clear: {
     es: "vaciar",
     fr: "effacer",
