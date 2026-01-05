@@ -4,7 +4,9 @@
 - guardarlo en localStorage - DONE
 - que PokedexContainer use la caché para el nombre - DONE
 - typeahead para buscar pokemons usando la caché que estamos guardando - DONE
-- router para pokemon
+- router para pokemon - DONE
+- Página "about" para tener más de una Página
+- Header con cosas y navigator para cambiar de páginas
 - useMemo (translation se está llamando mil veces para el mismo botón)
 - useFetch
 - testing
