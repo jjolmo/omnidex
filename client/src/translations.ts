@@ -12,6 +12,9 @@ type Translation = {
 
 // Usa siempre "_" en lugar de "-" para separar palabras
 const translations: Translation = {
+  about: {
+    es: "acerca de",
+  },
   "loading...": {
     es: "cargando...",
     fr: "chargement...",

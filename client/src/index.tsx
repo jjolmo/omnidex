@@ -14,6 +14,16 @@ const root = ReactDOM.createRoot(rootElement);
 root.render(
   <React.StrictMode>
     <PreferencesContextProvider>
+      {/*
+        <BrowserRouter>
+          <Routes>
+            <Route path="/" action element={<App />} />
+            <Route path="pokemon/:pokeId/" element={<App />} />
+            <Route path="about" element={<About />} />
+            <Route path="*" element={<div>Error 404</div>} />
+          </Routes>
+        </BrowserRouter>
+      */}
       <App />
     </PreferencesContextProvider>
   </React.StrictMode>,

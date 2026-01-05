@@ -5,6 +5,8 @@ import useTranslate from "../../hooks/useTranslate";
 import { capitalizeFirstLetter } from "../../utils/general";
 import { PreferencesContext } from "../../contexts/PreferencesContext";
 import ButtonNavigate from "../ButtonNavigate";
+import { useParams, useNavigate } from "react-router";
+import { debug } from "node:util";
 
 /*
 const options = [
@@ -33,11 +35,23 @@ export const PokemonSelector = () => {
   const { translate } = useTranslate();
   const [pokemonOptions, setPokemonOptions] = useState<ReactSelectOption[]>([]);
   const [pokemonFilter, setPokemonFilter] = useState("");
+  const navigate = useNavigate();
 
-  const handleOnPokemonNumberChangeFromNavButtons = (
+  let { pokeId } = useParams();
+
+  const handleOnPokemonNumberChangeFromInputField = (
     event: ChangeEvent<HTMLInputElement>,
   ): void => {
-    changeSelectedPokemonId(+event.target.value); // + casts to number
+    //changeSelectedPokemonId(+event.target.value); // + casts to number
+    navigatePokemon(+event.target.value);
+  };
+
+  const navigatePokemon = (id: number): void => {
+    //changeSelectedPokemonId(id);
+    if (id !== selectedPokemonId) {
+      changeSelectedPokemonId(id);
+    }
+    navigate(`/pokemon/${id}`, { replace: true });
   };
 
   useEffect(() => {
@@ -51,16 +65,26 @@ export const PokemonSelector = () => {
   }, [pokemonList]);
 
   useEffect(() => {
+    console.log(pokeId);
     if (pokemonList.length > 0) {
-      debugger;
+      let finalSelectedId: number = pokeId ? +pokeId : 0;
+      if (
+        +finalSelectedId < 1 ||
+        +finalSelectedId >= totalPokemonsWithPokedexCount
+      ) {
+        finalSelectedId = selectedPokemonId;
+      }
+
       setSelectedValue({
-        value: selectedPokemonId,
+        value: +finalSelectedId,
         label: pokemonList.length
           ? capitalizeFirstLetter(pokemonList[selectedPokemonId - 1].name)
           : "",
       });
+
+      navigatePokemon(finalSelectedId);
     }
-  }, [pokemonList, selectedPokemonId]);
+  }, [pokemonList, pokeId]);
 
   return (
     <>
@@ -68,7 +92,8 @@ export const PokemonSelector = () => {
         value={selectedValue}
         onChange={(event) => {
           if (event?.value) {
-            changeSelectedPokemonId(event.value);
+            //changeSelectedPokemonId(event.value);
+            navigatePokemon(event.value);
           }
         }}
         onInputChange={(textInFilter) => setPokemonFilter(textInFilter)}
@@ -84,13 +109,15 @@ export const PokemonSelector = () => {
         <ButtonNavigate
           buttonText="<<"
           enabled={+selectedPokemonId !== 1}
-          handleClick={() => changeSelectedPokemonId(1)}
+          //handleClick={() => changeSelectedPokemonId(1)}
+          handleClick={() => navigatePokemon(1)}
         />
         <ButtonNavigate
           buttonText="<"
           enabled={+selectedPokemonId > 1}
           handleClick={() =>
-            changeSelectedPokemonId(Number(selectedPokemonId) - 1)
+            //changeSelectedPokemonId(Number(selectedPokemonId) - 1)
+            navigatePokemon(Number(selectedPokemonId) - 1)
           }
         />
 
@@ -101,20 +128,22 @@ export const PokemonSelector = () => {
           min="1"
           max={totalPokemonsWithPokedexCount}
           value={selectedPokemonId}
-          onChange={handleOnPokemonNumberChangeFromNavButtons} // esto le pasa todos los argumentos de onChange como argumentos a la función handle, aunque no lo ponga en ningún sitio, porque mierdas de sugarcoating
+          onChange={handleOnPokemonNumberChangeFromInputField} // esto le pasa todos los argumentos de onChange como argumentos a la función handle, aunque no lo ponga en ningún sitio, porque mierdas de sugarcoating
         />
         <ButtonNavigate
           buttonText=">"
           enabled={+selectedPokemonId < totalPokemonsWithPokedexCount}
           handleClick={() =>
-            changeSelectedPokemonId(Number(selectedPokemonId) + 1)
+            //changeSelectedPokemonId(Number(selectedPokemonId) + 1)
+            navigatePokemon(Number(selectedPokemonId) + 1)
           }
         />
         <ButtonNavigate
           buttonText=">>"
           enabled={+selectedPokemonId !== totalPokemonsWithPokedexCount}
           handleClick={() =>
-            changeSelectedPokemonId(totalPokemonsWithPokedexCount)
+            //changeSelectedPokemonId(totalPokemonsWithPokedexCount)
+            navigatePokemon(totalPokemonsWithPokedexCount)
           }
         />
       </div>
